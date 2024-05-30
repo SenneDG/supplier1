@@ -20,10 +20,7 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -131,16 +128,29 @@ public class ShopItemController {
     }
 
     @PostMapping("/prepare-checkout")
-    public ResponseEntity<Void> prepareCheckout(@RequestBody List<ShopItem> shopItems) {
+    public ResponseEntity<Map<String, Integer>> prepareCheckout(@RequestBody List<ShopItem> shopItems) {
+        logger.info(shopItems.toString());
+        Map<String, Integer> outOfStockItems = new HashMap<String, Integer>();
+        boolean foundOutOfStock = false;
+
         for (ShopItem shopItem : shopItems) {
             UUID id = shopItem.getId();
             int quantity = shopItem.getQuantity();
+
             ShopItem existingShopItem = shopItemRepository.findShopItem(id).orElseThrow(() -> new RuntimeException("Item not found: " + id));
 
             int availableQuantity = existingShopItem.getQuantity() - existingShopItem.getLockedQuantity();
+            logger.info("Preparing for " + quantity + ", quantity available: " + availableQuantity);
             if (availableQuantity < quantity) {
                 logger.info("ABORT: Not enough quantity for item " + id);
-                return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build(); // Not enough quantity
+                outOfStockItems.put(id.toString(), availableQuantity);
+                foundOutOfStock = true;
+                continue;
+            }
+
+            if (foundOutOfStock) {
+                logger.info("ABORT: Out of stock found");
+                continue;
             }
 
             // Lock the items here, preventing other transactions from modifying them until the commit or rollback
@@ -150,7 +160,7 @@ public class ShopItemController {
         }
 
         persistTransactionState(TransactionStatus.PREPARE);
-        return ResponseEntity.ok().build(); // Vote to commit
+        return ResponseEntity.ok(outOfStockItems); // Vote to commit
     }
 
     @PostMapping("/commit-checkout")
