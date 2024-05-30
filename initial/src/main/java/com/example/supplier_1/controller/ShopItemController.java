@@ -3,6 +3,7 @@ package com.example.supplier_1.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,7 @@ public class ShopItemController {
 
     private final ShopItemRepository shopItemRepository;
     private static final Logger logger = LoggerFactory.getLogger(ShopItemController.class);
+
     public enum TransactionStatus {
         PREPARE,
         COMMIT,
@@ -40,6 +42,7 @@ public class ShopItemController {
 
     @Autowired
     private WebClient.Builder webClientBuilder;
+
     ShopItemController(ShopItemRepository shopItemRepository) {
         this.shopItemRepository = shopItemRepository;
     }
@@ -71,7 +74,7 @@ public class ShopItemController {
                                 List<ShopItem> items = itemsMap.stream()
                                         .map(itemMap -> objectMapper.convertValue(itemMap, ShopItem.class))
                                         .collect(Collectors.toList());
-                                if(lastOrderStatus == TransactionStatus.COMMIT) {
+                                if (lastOrderStatus == TransactionStatus.COMMIT) {
                                     System.out.println("Transaction was committed");
                                     checkoutCommit(items);
                                 } else {
@@ -103,9 +106,7 @@ public class ShopItemController {
     @GetMapping
     public CollectionModel<EntityModel<ShopItem>> getAllShopItems() {
         var shopItems = shopItemRepository.getAllShopItems().stream()
-                .map(shopItem -> EntityModel.of(shopItem,
-                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ShopItemController.class).getShopItemById(shopItem.getId())).withSelfRel(),
-                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ShopItemController.class).getAllShopItems()).withRel("shop-items")))
+                .map(shopItem -> shopItemToEntityModel(shopItem))
                 .collect(Collectors.toList());
 
         return CollectionModel.of(shopItems,
@@ -116,9 +117,7 @@ public class ShopItemController {
     public EntityModel<ShopItem> getShopItemById(@PathVariable UUID id) {
         ShopItem shopItem = shopItemRepository.findShopItem(id).orElseThrow(() -> new RuntimeException("Item not found: " + id));
 
-        return EntityModel.of(shopItem,
-                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ShopItemController.class).getShopItemById(id)).withSelfRel(),
-                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ShopItemController.class).getAllShopItems()).withRel("shop-items"));
+        return shopItemToEntityModel(shopItem);
     }
 
     @PostMapping
@@ -130,7 +129,7 @@ public class ShopItemController {
     @PostMapping("/prepare-checkout")
     public ResponseEntity<Map<String, Integer>> prepareCheckout(@RequestBody List<ShopItem> shopItems) {
         logger.info(shopItems.toString());
-        Map<String, Integer> outOfStockItems = new HashMap<String, Integer>();
+        Map<String, Integer> outOfStockItems = new HashMap<>();
         boolean foundOutOfStock = false;
 
         for (ShopItem shopItem : shopItems) {
@@ -216,5 +215,12 @@ public class ShopItemController {
         } catch (IOException e) {
             logger.error("Failed to persist transaction state", e);
         }
+    }
+
+    private EntityModel<ShopItem> shopItemToEntityModel(ShopItem shopItem) {
+        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ShopItemController.class).getShopItemById(shopItem.getId())).withSelfRel();
+        Link shopItemsLink = WebMvcLinkBuilder.linkTo(ShopItemController.class).withRel("shop-items");
+
+        return EntityModel.of(shopItem, Arrays.asList(selfLink, shopItemsLink));
     }
 }
