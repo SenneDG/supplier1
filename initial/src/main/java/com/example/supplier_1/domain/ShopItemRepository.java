@@ -13,6 +13,9 @@ public class ShopItemRepository {
 
     private static final UUID ITEM1_UUID = UUID.fromString("123e4567-e89b-12d3-a456-426614174003");
     private static final UUID ITEM2_UUID = UUID.fromString("123e4567-e89b-12d3-a456-426614174004");
+    private static final UUID ITEM3_UUID = UUID.fromString("123e4567-e89b-12d3-a456-426614174005");
+    private static final UUID ITEM4_UUID = UUID.fromString("123e4567-e89b-12d3-a456-426614174006");
+    private static final UUID ITEM5_UUID = UUID.fromString("123e4567-e89b-12d3-a456-426614174007");
 
     @PostConstruct
     public void init() {
@@ -59,6 +62,9 @@ public class ShopItemRepository {
 
         shopItems.put(item1.getId(), item1);
         shopItems.put(item2.getId(), item2);
+        shopItems.put(item2.getId(), item3);
+        shopItems.put(item2.getId(), item4);
+        shopItems.put(item2.getId(), item5);
     }
 
     public Optional<ShopItem> findShopItem(UUID id) {
