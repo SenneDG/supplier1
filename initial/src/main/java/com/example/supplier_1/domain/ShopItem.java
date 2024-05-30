@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public class ShopItem {
     private UUID id;
-    public String supplier = "Supplier 2";
+    public String supplier = "Supplier 1";
     private String name;
     private String description;
     private double price;

@@ -13,6 +13,9 @@ public class ShopItemRepository {
 
     private static final UUID ITEM1_UUID = UUID.fromString("123e4567-e89b-12d3-a456-426614174003");
     private static final UUID ITEM2_UUID = UUID.fromString("123e4567-e89b-12d3-a456-426614174004");
+    private static final UUID ITEM3_UUID = UUID.fromString("123e4567-e89b-12d3-a456-426614174005");
+    private static final UUID ITEM4_UUID = UUID.fromString("123e4567-e89b-12d3-a456-426614174006");
+    private static final UUID ITEM5_UUID = UUID.fromString("123e4567-e89b-12d3-a456-426614174007");
 
     @PostConstruct
     public void init() {
@@ -30,10 +33,38 @@ public class ShopItemRepository {
         item2.setDescription("La Chouffe 75cl is een Belgisch blond bier dat bekendstaat om een verfrissend en licht kruidig karakter. La Chouffe bier is een bier van hoge gisting met nagisting op de fles. Verder heeft het een vol en rijk karakter waarin toetsen van kruiden en fruit samenkomen met het beste van hop.");
         item2.setPrice(5.25);
         item2.setQuantity(7);
-        item2.setImageUrl("https://res.cloudinary.com/boozeboodcdn/image/upload/f_auto/e_trim:10/c_pad/g_south/w_140/h_455/c_limit,w_140,h_455/q_auto:best/v20210322/HD/09001.jpg");
+        item2.setImageUrl("https://www.belbiere.com/wp-content/uploads/2016/05/chouffe-blonde-75cl.jpg");
+        
+        ShopItem item3 = new ShopItem();
+        item3.setId(ITEM3_UUID);
+        item3.setName("GUINNESS DRAUGHT");
+        item3.setDescription("Guinness Draught is een iconisch Iers stout bier dat bekendstaat om zijn rijke en romige smaak. Het heeft een kenmerkende donkere kleur en een dikke schuimkraag, met smaken van geroosterde mout en een subtiele bittere afdronk.");
+        item3.setPrice(4.50);
+        item3.setQuantity(12);
+        item3.setImageUrl("https://www.1001spirits.com/tuotekuvat/800x800/Guinness%20Draught%20Stout%204%2C2%25%2024x0%2C44%20l.png");
+        
+        ShopItem item4 = new ShopItem();
+        item4.setId(ITEM4_UUID);
+        item4.setName("HEINEKEN 33CL");
+        item4.setDescription("Heineken 33cl is een verfrissend en licht pilsener bier uit Nederland. Het staat bekend om zijn heldere, gouden kleur en een lichte, kruidige smaak die perfect in balans is met een zachte bitterheid. Ideaal voor elke gelegenheid.");
+        item4.setPrice(2.00);
+        item4.setQuantity(24);
+        item4.setImageUrl("https://mmihomedelivery.ae/wp-content/uploads/2023/10/249-11.png");
+        
+        ShopItem item5 = new ShopItem();
+        item5.setId(ITEM5_UUID);
+        item5.setName("CORONA EXTRA 35.5CL");
+        item5.setDescription("Corona Extra 35.5cl is een Mexicaans lager bier dat bekendstaat om zijn lichte en verfrissende smaak. Het heeft een heldere gouden kleur en wordt vaak geserveerd met een schijfje limoen voor een extra vleugje frisheid. Perfect voor zomerse dagen.");
+        item5.setPrice(3.25);
+        item5.setQuantity(18);
+        item5.setImageUrl("https://cdn.gustero.ch/media/image/ac/4d/a3/Corona-Extra-Bier-33cl.jpg");
+
 
         shopItems.put(item1.getId(), item1);
         shopItems.put(item2.getId(), item2);
+        shopItems.put(item3.getId(), item3);
+        shopItems.put(item4.getId(), item4);
+        shopItems.put(item5.getId(), item5);
     }
 
     public Optional<ShopItem> findShopItem(UUID id) {
