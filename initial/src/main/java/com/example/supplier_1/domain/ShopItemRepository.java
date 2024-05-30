@@ -65,7 +65,6 @@ public class ShopItemRepository {
         shopItems.put(item2.getId(), item3);
         shopItems.put(item2.getId(), item4);
         shopItems.put(item2.getId(), item5);
-
     }
 
     public Optional<ShopItem> findShopItem(UUID id) {
