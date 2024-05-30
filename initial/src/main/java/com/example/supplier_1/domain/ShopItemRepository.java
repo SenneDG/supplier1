@@ -21,50 +21,32 @@ public class ShopItemRepository {
     public void init() {
         ShopItem item1 = new ShopItem();
         item1.setId(ITEM1_UUID);
-        item1.setName("KARMELIET TRIPEL 75CL");
-        item1.setDescription("Karmeliet Tripel 75cl is het absolute boegbeeld van de brouwerij. Iedere fles Karmeliet Tripel wordt gemaakt op basis van een oud en historisch drie-granenrecept, bestaande uit tarwe, haver en gerst. Ook vandaag de dag zien de brouwmeesters van dit merk dit nog steeds als het ideale recept voor hun speciaalbier Naar eigen zeggen is iedere slok die je van dit tripel bier neemt een 'reis voor de zintuigen'.");
-        item1.setPrice(7.75);
-        item1.setQuantity(12);
-        item1.setImageUrl("https://res.cloudinary.com/boozeboodcdn/image/upload/f_auto/e_trim:10/c_pad/g_south/w_140/h_455/c_limit,w_140,h_455/q_auto:best/v20210322/HD/09012.jpg");
+        item1.setName("COCA-COLA 33CL");
+        item1.setDescription("Coca-Cola 33cl is een verfrissende en iconische frisdrank die bekendstaat om zijn unieke smaak en bruisende karakter. Perfect voor elke gelegenheid en heerlijk koel geserveerd.");
+        item1.setPrice(1.50);
+        item1.setQuantity(20);
+        item1.setImageUrl("https://goedkoopdrank.be/wp-content/uploads/2023/06/GD60.jpg");
 
         ShopItem item2 = new ShopItem();
         item2.setId(ITEM2_UUID);
-        item2.setName("LA CHOUFFE 75CL");
-        item2.setDescription("La Chouffe 75cl is een Belgisch blond bier dat bekendstaat om een verfrissend en licht kruidig karakter. La Chouffe bier is een bier van hoge gisting met nagisting op de fles. Verder heeft het een vol en rijk karakter waarin toetsen van kruiden en fruit samenkomen met het beste van hop.");
-        item2.setPrice(5.25);
-        item2.setQuantity(7);
-        item2.setImageUrl("https://www.belbiere.com/wp-content/uploads/2016/05/chouffe-blonde-75cl.jpg");
-        
+        item2.setName("SPA BLÅ 50CL");
+        item2.setDescription("Spa Blå 50cl is een verfrissend natuurlijk mineraalwater uit de Belgische Ardennen. Het staat bekend om zijn zuiverheid en zachte smaak, ideaal om op elk moment van de dag van te genieten.");
+        item2.setPrice(1.00);
+        item2.setQuantity(30);
+        item2.setImageUrl("https://www.dirckiii.nl/media/catalog/product/cache/d55535bea25a3d0676d7fc260feb4497/8/f/8f1294769bfdbd1447ca63d781f13f0c4bfae269_5410013126737_Spa_Reine_Sport.jpg");
+
         ShopItem item3 = new ShopItem();
         item3.setId(ITEM3_UUID);
-        item3.setName("GUINNESS DRAUGHT");
-        item3.setDescription("Guinness Draught is een iconisch Iers stout bier dat bekendstaat om zijn rijke en romige smaak. Het heeft een kenmerkende donkere kleur en een dikke schuimkraag, met smaken van geroosterde mout en een subtiele bittere afdronk.");
-        item3.setPrice(4.50);
-        item3.setQuantity(12);
-        item3.setImageUrl("https://www.1001spirits.com/tuotekuvat/800x800/Guinness%20Draught%20Stout%204%2C2%25%2024x0%2C44%20l.png");
-        
-        ShopItem item4 = new ShopItem();
-        item4.setId(ITEM4_UUID);
-        item4.setName("HEINEKEN 33CL");
-        item4.setDescription("Heineken 33cl is een verfrissend en licht pilsener bier uit Nederland. Het staat bekend om zijn heldere, gouden kleur en een lichte, kruidige smaak die perfect in balans is met een zachte bitterheid. Ideaal voor elke gelegenheid.");
-        item4.setPrice(2.00);
-        item4.setQuantity(24);
-        item4.setImageUrl("https://mmihomedelivery.ae/wp-content/uploads/2023/10/249-11.png");
-        
-        ShopItem item5 = new ShopItem();
-        item5.setId(ITEM5_UUID);
-        item5.setName("CORONA EXTRA 35.5CL");
-        item5.setDescription("Corona Extra 35.5cl is een Mexicaans lager bier dat bekendstaat om zijn lichte en verfrissende smaak. Het heeft een heldere gouden kleur en wordt vaak geserveerd met een schijfje limoen voor een extra vleugje frisheid. Perfect voor zomerse dagen.");
-        item5.setPrice(3.25);
-        item5.setQuantity(18);
-        item5.setImageUrl("https://cdn.gustero.ch/media/image/ac/4d/a3/Corona-Extra-Bier-33cl.jpg");
+        item3.setName("ORANGINA 25CL");
+        item3.setDescription("Orangina 25cl is een verfrissende frisdrank met een unieke mix van sinaasappelsap en echte vruchtvlees. Het staat bekend om zijn licht bruisende karakter en heerlijke, natuurlijke smaak. Perfect voor een verfrissende pauze.");
+        item3.setPrice(1.75);
+        item3.setQuantity(15);
+        item3.setImageUrl("https://media.carrefour.fr/medias/0dcdea4544113db486517310cc4ede47/p_540x540/03249760013319-h1l1-s12.jpg");
 
 
         shopItems.put(item1.getId(), item1);
         shopItems.put(item2.getId(), item2);
         shopItems.put(item3.getId(), item3);
-        shopItems.put(item4.getId(), item4);
-        shopItems.put(item5.getId(), item5);
     }
 
     public Optional<ShopItem> findShopItem(UUID id) {

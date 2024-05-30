@@ -73,10 +73,10 @@ public class ShopItemController {
                                         .collect(Collectors.toList());
                                 if(lastOrderStatus == TransactionStatus.COMMIT) {
                                     System.out.println("Transaction was committed");
-                                    checkoutCommit(items);
+                                    checkoutCommit(items, getApiKey());
                                 } else {
                                     System.out.println("Transaction was rolled back");
-                                    checkoutRollback(items);
+                                    checkoutRollback(items, getApiKey());
                                 }
                             },
                             error -> {
@@ -100,35 +100,57 @@ public class ShopItemController {
         }
     }
 
-    @GetMapping
-    public CollectionModel<EntityModel<ShopItem>> getAllShopItems() {
-        var shopItems = shopItemRepository.getAllShopItems().stream()
-                .map(shopItem -> EntityModel.of(shopItem,
-                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ShopItemController.class).getShopItemById(shopItem.getId())).withSelfRel(),
-                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ShopItemController.class).getAllShopItems()).withRel("shop-items")))
-                .collect(Collectors.toList());
-
-        return CollectionModel.of(shopItems,
-                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ShopItemController.class).getAllShopItems()).withSelfRel());
+    private String getApiKey() {
+        return "Iw8zeveVyaPNWonPNaU0213uw3g6Ei";
     }
 
-    @GetMapping("/{id}")
-    public EntityModel<ShopItem> getShopItemById(@PathVariable UUID id) {
+    private boolean isValidApiKey(String key) {
+        return key.equals(getApiKey());
+    }
+
+    @GetMapping
+    public ResponseEntity<CollectionModel<EntityModel<ShopItem>>> getAllShopItems(@RequestParam(value = "key") String apiKey) {
+        if (!isValidApiKey(apiKey)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        var shopItems = shopItemRepository.getAllShopItems().stream()
+                .map(shopItem -> EntityModel.of(shopItem,
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ShopItemController.class).getShopItemById(shopItem.getId(), apiKey)).withSelfRel(),
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ShopItemController.class).getAllShopItems(apiKey)).withRel("shop-items")))
+                .collect(Collectors.toList());
+
+        CollectionModel<EntityModel<ShopItem>> collectionModel = CollectionModel.of(shopItems,
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ShopItemController.class).getAllShopItems(apiKey)).withSelfRel());
+
+        return ResponseEntity.ok(collectionModel);
+    }
+
+        @GetMapping("/{id}")
+    public ResponseEntity<EntityModel<ShopItem>> getShopItemById(@PathVariable UUID id, @RequestParam(value = "key") String apiKey) {
+        if (!isValidApiKey(apiKey)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Or you can return an error message
+        }
+
         ShopItem shopItem = shopItemRepository.findShopItem(id).orElseThrow(() -> new RuntimeException("Item not found: " + id));
 
-        return EntityModel.of(shopItem,
-                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ShopItemController.class).getShopItemById(id)).withSelfRel(),
-                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ShopItemController.class).getAllShopItems()).withRel("shop-items"));
+        EntityModel<ShopItem> entityModel = EntityModel.of(shopItem,
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ShopItemController.class).getShopItemById(id, apiKey)).withSelfRel(),
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ShopItemController.class).getAllShopItems(getApiKey())).withRel("shop-items"));
+
+        return ResponseEntity.ok(entityModel);
     }
 
     @PostMapping
-    ShopItem addShopItem(@RequestBody ShopItem shopItem) {
+    public ResponseEntity<ShopItem> addShopItem(@RequestBody ShopItem shopItem, @RequestParam(value = "key") String apiKey) {
+        if (!isValidApiKey(apiKey)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
         shopItemRepository.addShopItem(shopItem);
-        return shopItem;
+
+        return ResponseEntity.ok(shopItem);
     }
 
     @PostMapping("/prepare-checkout")
-    public ResponseEntity<Map<String, Integer>> prepareCheckout(@RequestBody List<ShopItem> shopItems) {
+    public ResponseEntity<Map<String, Integer>> prepareCheckout(@RequestBody List<ShopItem> shopItems, @RequestParam(value = "key") String apiKey) {
+        if (!isValidApiKey(apiKey)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         logger.info(shopItems.toString());
         Map<String, Integer> outOfStockItems = new HashMap<String, Integer>();
         boolean foundOutOfStock = false;
@@ -164,7 +186,8 @@ public class ShopItemController {
     }
 
     @PostMapping("/commit-checkout")
-    public synchronized ResponseEntity<Void> checkoutCommit(@RequestBody List<ShopItem> shopItems) {
+    public synchronized ResponseEntity<Void> checkoutCommit(@RequestBody List<ShopItem> shopItems, @RequestParam(value = "key") String apiKey) {
+        if (!isValidApiKey(apiKey)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         for (ShopItem shopItem : shopItems) {
             UUID id = shopItem.getId();
             int quantity = shopItem.getQuantity();
@@ -183,7 +206,8 @@ public class ShopItemController {
     }
 
     @PostMapping("/rollback-checkout")
-    public synchronized ResponseEntity<Void> checkoutRollback(@RequestBody List<ShopItem> shopItems) {
+    public synchronized ResponseEntity<Void> checkoutRollback(@RequestBody List<ShopItem> shopItems, @RequestParam(value = "key") String apiKey) {
+        if (!isValidApiKey(apiKey)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         for (ShopItem shopItem : shopItems) {
             UUID id = shopItem.getId();
             ShopItem existingShopItem = shopItemRepository.findShopItem(id).orElseThrow(() -> new RuntimeException("Item not found: " + id));
@@ -200,13 +224,15 @@ public class ShopItemController {
     }
 
     @PutMapping("/{id}")
-    ShopItem updateShopItem(@PathVariable UUID id, @RequestBody ShopItem updatedShopItem) {
+    ShopItem updateShopItem(@PathVariable UUID id, @RequestBody ShopItem updatedShopItem, @RequestParam(value = "key") String apiKey) {
+        if (!isValidApiKey(apiKey)) return null;
         shopItemRepository.updateShopItem(id, updatedShopItem);
         return updatedShopItem;
     }
 
     @DeleteMapping("/{id}")
-    void deleteShopItem(@PathVariable UUID id) {
+    void deleteShopItem(@PathVariable UUID id, @RequestParam(value = "key") String apiKey) {
+        if (!isValidApiKey(apiKey)) return;
         shopItemRepository.deleteShopItem(id);
     }
 
